@@ -7,8 +7,8 @@ import tempfile
 import pandas as pd
 from groq import Groq
 from dotenv import load_dotenv
-import toml
 import json
+from google.oauth2 import service_account
 
 # Load environment variables from .env file
 load_dotenv()
@@ -21,16 +21,19 @@ client = Groq(
 # Extract Google credentials from secrets
 google_credentials_toml = st.secrets["google_application_credentials"]
 
-# Parse TOML to a Python dictionary
-google_credentials = toml.loads(toml.dumps(google_credentials_toml))
+# Convert the AttrDict to a regular dictionary
+google_credentials_dict = dict(google_credentials_toml)
+
 
 # Create a temporary file for Google credentials
 with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp_file:
-    json.dump(google_credentials, tmp_file)
+    # Write the dictionary to the temporary JSON file
+    json.dump(google_credentials_dict, tmp_file)
     tmp_file_path = tmp_file.name
 
-# Set the environment variable for Google credentials
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = tmp_file_path
+# Now you can use the `tmp_file_path` to authenticate with Google services
+os.environ['GOOGLE_APPLICATION_CREDENTIALS']  = service_account.Credentials.from_service_account_file(tmp_file_path)
+
 
 # Initialize Google Vision Client
 def init_vision_client():
