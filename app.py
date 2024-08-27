@@ -26,7 +26,7 @@ google_credentials_dict = dict(google_credentials_toml)
 
 
 # Create a temporary file for Google credentials
-with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp_file:
+with tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode='w') as tmp_file:
     # Write the dictionary to the temporary JSON file
     json.dump(google_credentials_dict, tmp_file)
     tmp_file_path = tmp_file.name
