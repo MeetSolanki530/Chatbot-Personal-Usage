@@ -8,6 +8,7 @@ import pandas as pd
 from groq import Groq
 from dotenv import load_dotenv
 import toml
+import json
 import tempfile
 
 load_dotenv()
@@ -17,13 +18,13 @@ client = Groq(
     api_key=groq_config["api_key"],
 )
 
-# Extract Google credentials from secrets
-google_credentials = st.secrets["google_application_credentials"]
+# Parse TOML to a Python dictionary
+google_credentials = toml.loads(toml.dumps(google_credentials_toml))
 
 # Create a temporary file for Google credentials
 with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp_file:
     # Convert credentials dictionary to JSON format
-    tmp_file.write(toml.dumps(google_credentials).encode())
+    json.dump(google_credentials, tmp_file)
     tmp_file_path = tmp_file.name
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = tmp_file_path
