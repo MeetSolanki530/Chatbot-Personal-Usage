@@ -7,6 +7,8 @@ import tempfile
 import pandas as pd
 from groq import Groq
 from dotenv import load_dotenv
+import json
+import tempfile
 
 load_dotenv()
 
@@ -15,9 +17,13 @@ client = Groq(
     api_key=groq_config["api_key"],
 )
 
-# Set up Google Vision API credentials directly
+# Create a temporary file for Google credentials
 google_credentials = st.secrets["google_application_credentials"]
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_credentials
+with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp_file:
+    json.dump(google_credentials, tmp_file)
+    tmp_file_path = tmp_file.name
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = tmp_file_path
 
 # Initialize Google Vision Client
 def init_vision_client():
