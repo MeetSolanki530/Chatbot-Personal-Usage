@@ -10,10 +10,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+groq_config = st.secrets["groq"]
 client = Groq(
-    # This is the default and can be omitted
-    api_key=os.getenv("GROQ_API_KEY"),
+    api_key=groq_config["api_key"],
 )
+
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 
