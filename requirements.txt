@@ -1,0 +1,7 @@
+pillow
+python-dotenv
+streamlit
+groq
+pandas
+pdf2image
+google-cloud-vision
