@@ -32,7 +32,9 @@ with tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode='w') as tmp_
     tmp_file_path = tmp_file.name
 
 # Now you can use the `tmp_file_path` to authenticate with Google services
-os.environ['GOOGLE_APPLICATION_CREDENTIALS']  = service_account.Credentials.from_service_account_file(tmp_file_path)
+os.environ['GOOGLE_APPLICATION_CREDENTIALS']  =  tmp_file_path 
+
+credentials = service_account.Credentials.from_service_account_file(tmp_file_path)
 
 
 # Initialize Google Vision Client
