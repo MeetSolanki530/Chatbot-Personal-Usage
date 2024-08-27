@@ -18,6 +18,9 @@ client = Groq(
     api_key=groq_config["api_key"],
 )
 
+# Extract Google credentials from secrets
+google_credentials_toml = st.secrets["google_application_credentials"]
+
 # Parse TOML to a Python dictionary
 google_credentials = toml.loads(toml.dumps(google_credentials_toml))
 
