@@ -24,7 +24,6 @@ google_credentials_toml = st.secrets["google_application_credentials"]
 # Convert the AttrDict to a regular dictionary
 google_credentials_dict = dict(google_credentials_toml)
 
-
 # Create a temporary file for Google credentials
 with tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode='w') as tmp_file:
     # Write the dictionary to the temporary JSON file
@@ -32,10 +31,9 @@ with tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode='w') as tmp_
     tmp_file_path = tmp_file.name
 
 # Now you can use the `tmp_file_path` to authenticate with Google services
-os.environ['GOOGLE_APPLICATION_CREDENTIALS']  =  tmp_file_path 
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = tmp_file_path
 
 credentials = service_account.Credentials.from_service_account_file(tmp_file_path)
-
 
 # Initialize Google Vision Client
 def init_vision_client():
@@ -87,15 +85,18 @@ def process_excel(file):
         st.error(f"Error processing Excel/CSV file: {e}")
         return ""
 
-# Interact with GPT-4
-def ask_gpt4(prompt):
+# Interact with GPT-4, ensuring context is utilized properly
+def ask_gpt4(prompt, extracted_text):
     try:
+        # Ensure the context is reflected in the question
+        if not any(keyword in prompt.lower() for keyword in extracted_text.lower().split()):
+            return "Please ask a question related to the provided content."
+
         response = client.chat.completions.create(
-        model="mixtral-8x7b-32768",
-        messages=[{"role": "user", "content": prompt}],
-    )
+            model="mixtral-8x7b-32768",
+            messages=[{"role": "user", "content": prompt}],
+        )
         return response.choices[0].message.content.strip()
-    
     except Exception as e:
         st.error(f"Error communicating with GPT: {e}")
         return ""
@@ -119,8 +120,8 @@ def main():
     extracted_text = ""
 
     if input_type == "Text":
-        st.header("Enter Text")
-        user_text = st.text_area("Input Text", height=200)
+        st.header("Enter Context which you want to search")
+        user_text = st.text_area("Input question of above context", height=200)
         if user_text:
             extracted_text = user_text
 
@@ -175,7 +176,7 @@ def main():
                     prompt += "\n\nPrevious conversation:\n" + "\n".join(st.session_state.conversation_history)
                 prompt += f"\n\nQuestion: {question}\nAnswer:"
 
-                answer = ask_gpt4(prompt)
+                answer = ask_gpt4(prompt, extracted_text)
 
                 st.session_state.conversation_history.append(f"Q: {question}\nA: {answer}")
 
