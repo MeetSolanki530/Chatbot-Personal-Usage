@@ -9,8 +9,8 @@ from groq import Groq
 from dotenv import load_dotenv
 import toml
 import json
-import tempfile
 
+# Load environment variables from .env file
 load_dotenv()
 
 groq_config = st.secrets["groq"]
@@ -26,10 +26,10 @@ google_credentials = toml.loads(toml.dumps(google_credentials_toml))
 
 # Create a temporary file for Google credentials
 with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp_file:
-    # Convert credentials dictionary to JSON format
-    json.dump(dict(google_credentials), tmp_file)
+    json.dump(google_credentials, tmp_file)
     tmp_file_path = tmp_file.name
 
+# Set the environment variable for Google credentials
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = tmp_file_path
 
 # Initialize Google Vision Client
@@ -59,22 +59,19 @@ def extract_text_from_image(image_path, client):
 # Extract text from a PDF using Google Vision API
 def extract_text_from_pdf(pdf_path, client):
     try:
-        # Convert PDF pages to images
         with tempfile.TemporaryDirectory() as path:
             images = convert_from_path(pdf_path, dpi=300, output_folder=path, fmt='png')
             extracted_text = ""
             for i, image in enumerate(images):
-                # Save image to a temporary file
                 temp_image_path = os.path.join(path, f"page_{i + 1}.png")
                 image.save(temp_image_path, 'PNG')
-                # Extract text from the image
                 page_text = extract_text_from_image(temp_image_path, client)
                 extracted_text += f"--- Page {i + 1} ---\n{page_text}\n\n"
             return extracted_text
     except Exception as e:
         st.error(f"Error extracting text from PDF: {e}")
         return ""
-    
+
 # Process Excel/CSV files
 def process_excel(file):
     try:
@@ -127,12 +124,10 @@ def main():
         uploaded_image = st.file_uploader("Choose an image file", type=["png", "jpg", "jpeg"])
         if uploaded_image and vision_client:
             try:
-                # Save the uploaded image to a temporary file
                 with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded_image.name)[1]) as tmp_image:
                     tmp_image.write(uploaded_image.read())
                     tmp_image_path = tmp_image.name
 
-                # Extract text
                 extracted_text = extract_text_from_image(tmp_image_path, vision_client)
                 st.subheader("Extracted Text")
                 st.text_area("Text from Image", value=extracted_text, height=200)
@@ -144,12 +139,10 @@ def main():
         uploaded_pdf = st.file_uploader("Choose a PDF file", type=["pdf"])
         if uploaded_pdf and vision_client:
             try:
-                # Save the uploaded PDF to a temporary file
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_pdf:
                     tmp_pdf.write(uploaded_pdf.read())
                     tmp_pdf_path = tmp_pdf.name
 
-                # Extract text
                 with st.spinner("Extracting text from PDF..."):
                     extracted_text = extract_text_from_pdf(tmp_pdf_path, vision_client)
 
@@ -166,14 +159,12 @@ def main():
             st.subheader("Extracted Text")
             st.text_area("Text from Excel/CSV", value=extracted_text, height=300)
 
- # Ask a question about the extracted text
     if extracted_text:
         st.header("Ask a Question")
-        question = st.text_area("Enter your question about the content above:",height=300)
+        question = st.text_area("Enter your question about the content above:", height=300)
 
         if st.button("Get Answer") and question:
             with st.spinner("Generating answer..."):
-                # Build prompt with conversation history
                 prompt = "Here is the content:\n\n" + extracted_text
                 if st.session_state.conversation_history:
                     prompt += "\n\nPrevious conversation:\n" + "\n".join(st.session_state.conversation_history)
@@ -181,13 +172,11 @@ def main():
 
                 answer = ask_gpt4(prompt)
 
-                # Save the current Q&A to the session state
                 st.session_state.conversation_history.append(f"Q: {question}\nA: {answer}")
 
                 st.subheader("Answer")
                 st.write(answer)
 
-    # Display conversation history
     if st.session_state.conversation_history:
         st.header("Conversation History")
         st.write("\n".join(st.session_state.conversation_history))
