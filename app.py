@@ -27,7 +27,7 @@ google_credentials = toml.loads(toml.dumps(google_credentials_toml))
 # Create a temporary file for Google credentials
 with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp_file:
     # Convert credentials dictionary to JSON format
-    json.dump(google_credentials, tmp_file)
+    json.dump(dict(google_credentials), tmp_file)
     tmp_file_path = tmp_file.name
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = tmp_file_path
