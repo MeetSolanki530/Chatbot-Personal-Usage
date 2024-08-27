@@ -3,7 +3,6 @@ import streamlit as st
 from PIL import Image
 from pdf2image import convert_from_path
 from google.cloud import vision
-from openai import OpenAI
 import tempfile
 import pandas as pd
 from groq import Groq
