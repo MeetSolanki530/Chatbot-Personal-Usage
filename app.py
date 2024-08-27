@@ -17,6 +17,9 @@ client = Groq(
     api_key=groq_config["api_key"],
 )
 
+# Extract Google credentials from secrets
+google_credentials = secrets["google_application_credentials"]
+
 # Create a temporary file for Google credentials
 with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp_file:
     # Convert credentials dictionary to JSON format
