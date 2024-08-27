@@ -103,7 +103,7 @@ def ask_gpt4(prompt, extracted_text):
 
 # Streamlit App
 def main():
-    st.title("Multi-Input Groq Chatbot")
+    st.title("Chatbot by Meet D. Solanki")
     st.write("Upload a text file, image, PDF, Excel, or CSV file and ask questions about its content.")
 
     # Initialize clients and keys
