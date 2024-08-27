@@ -15,8 +15,9 @@ client = Groq(
     api_key=groq_config["api_key"],
 )
 
-
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+# Set up Google Vision API credentials directly
+google_credentials = st.secrets["google_application_credentials"]
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_credentials
 
 # Initialize Google Vision Client
 def init_vision_client():
