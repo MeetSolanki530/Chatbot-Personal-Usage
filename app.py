@@ -18,7 +18,7 @@ client = Groq(
 )
 
 # Extract Google credentials from secrets
-google_credentials = secrets["google_application_credentials"]
+google_credentials = st.secrets["google_application_credentials"]
 
 # Create a temporary file for Google credentials
 with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp_file:
