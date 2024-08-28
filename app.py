@@ -120,7 +120,7 @@ def main():
     extracted_text = ""
 
     if input_type == "Text":
-        st.header("Enter Context which you want to search")
+        st.header("Enter Context")
         user_text = st.text_area("Input question of above context", height=200)
         if user_text:
             extracted_text = user_text
